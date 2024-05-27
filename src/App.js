@@ -1,5 +1,7 @@
 import React from "react";
 
+// Добавил комментарии
+
 function App() {
     return (
         <div className="App">
