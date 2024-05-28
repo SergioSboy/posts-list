@@ -25,6 +25,7 @@ function App() {
         return posts;
     }
 
+    // My comment
     const createPost = (newPost) => {
         setPosts([...posts, newPost]);
     }
