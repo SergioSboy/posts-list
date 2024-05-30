@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import './styles/App.css'
 import PostList from "./components/PostList/PostList";
 import PostForm from "./components/PostForm/PostForm";
@@ -6,23 +6,29 @@ import PostFilter from "./components/PostFilter/PostFilter";
 import MyModal from "./components/UI/modal/MyModal";
 import MyButton from "./components/UI/button/MyButton";
 import {usePosts} from "./hooks/usePosts";
+import PostService from "./API/PostService";
+import Loader from "./components/UI/Loader/Loader";
 
 // Добавил комментарии
 
 function App() {
 
-    const [posts, setPosts] = useState([
-        {id: 1, title: 'JavaScript', body: 'Description'},
-        {id: 2, title: '1C', body: 'Description'},
-        {id: 3, title: 'C++', body: 'Description'},
-        {id: 4, title: 'C#', body: 'Description'}
-    ]);
-
+    const [posts, setPosts] = useState([]);
     const [filter, setFilter] = useState({sort: '', query: ''})
     const [modal, setModal] = useState(false);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
+    const [isPostLoading, setIsPostLoading] = useState(false);
 
+    useEffect(() => {
+        fetchPosts()
+    }, []);
 
+    async function fetchPosts() {
+        setIsPostLoading(true)
+        const posts = await PostService.getAll()
+        setPosts(posts);
+        setIsPostLoading(false)
+    }
 
 
     // My comment
@@ -45,8 +51,11 @@ function App() {
             <hr style={{margin: '15px 0'}}/>
 
             <PostFilter filter={filter} setFilter={setFilter}/>
+            {isPostLoading
+                ? <div style={{display: "flex", justifyContent: 'center', marginTop: '20px'}}><Loader/></div>
+                : <PostList remove={removePost} posts={sortedAndSearchedPosts} title={'Список постов'}/>
+            }
 
-            <PostList remove={removePost} posts={sortedAndSearchedPosts} title={'Список постов'}/>
 
 
         </div>
