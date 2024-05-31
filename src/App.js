@@ -8,6 +8,9 @@ import MyButton from "./components/UI/button/MyButton";
 import {usePosts} from "./hooks/usePosts";
 import PostService from "./API/PostService";
 import Loader from "./components/UI/Loader/Loader";
+import {useFetching} from "./hooks/useFetching";
+import {getPageCount} from "./utils/page";
+import Pagination from "./components/UI/pagination/Pagination";
 
 // Добавил комментарии
 
@@ -17,18 +20,20 @@ function App() {
     const [filter, setFilter] = useState({sort: '', query: ''})
     const [modal, setModal] = useState(false);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
-    const [isPostLoading, setIsPostLoading] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [page, setPage] = useState(10);
+    const [fetchPosts, isPostLoading, postError] = useFetching(async () => {
+        const response = await PostService.getAll(limit, page)
+        setPosts(response.data);
+        const totalCount = response.headers['x-total-count']
+        setTotalPages(getPageCount(totalCount, limit));
+    })
+
 
     useEffect(() => {
         fetchPosts()
-    }, []);
-
-    async function fetchPosts() {
-        setIsPostLoading(true)
-        const posts = await PostService.getAll()
-        setPosts(posts);
-        setIsPostLoading(false)
-    }
+    }, [page]);
 
 
     // My comment
@@ -41,6 +46,10 @@ function App() {
         setPosts(posts.filter(p => p.id !== post.id));
     }
 
+    const changePage = (page) => {
+        setPage(page);
+    }
+
     return (
         <div className="App">
             <MyButton style={{marginTop: '30px'}} onClick={() => setModal(true)}>Создать пост</MyButton>
@@ -51,11 +60,19 @@ function App() {
             <hr style={{margin: '15px 0'}}/>
 
             <PostFilter filter={filter} setFilter={setFilter}/>
+
+            {postError &&
+                <h1>Произошла ошибка {postError}</h1>
+            }
             {isPostLoading
                 ? <div style={{display: "flex", justifyContent: 'center', marginTop: '20px'}}><Loader/></div>
                 : <PostList remove={removePost} posts={sortedAndSearchedPosts} title={'Список постов'}/>
             }
-
+            <Pagination
+                page={page}
+                changePage={changePage}
+                totalPages={totalPages}
+            />
 
 
         </div>
