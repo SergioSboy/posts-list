@@ -3,9 +3,11 @@
     padding: 0;
     box-sizing: border-box;
 }
-#root{
+#root {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: center; /* Центрирование по вертикали */
+    align-items: center; /* Центрирование по горизонтали */
 }
 
 .App{
@@ -44,4 +46,17 @@
 .page__current{
     border: 2px solid blueviolet;
     font-weight: bold;
+}
+
+.navbar{
+    height: 50px;
+    display: flex;
+    width: 100% ;
+    align-items: center;
+    padding: 0 15px;
+    background: rgba(182, 182, 182, 0.76);
+}
+
+.navbar__links{
+    margin-left: auto;
 }
