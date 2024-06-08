@@ -13,7 +13,9 @@
 .App{
     width: 800px;
 }
-
+.post_btns{
+    display: flex;
+}
 .post-enter{
     transform: translateX(-350px);
 }
